@@ -2,8 +2,8 @@
 import 'package:greengrocer/src/models/item_model.dart';
 
 class CartItemModel {
-  late final ItemModel item;
-  late final int quantity;
+  ItemModel item;
+  int quantity;
 
   CartItemModel({
     required this.item,

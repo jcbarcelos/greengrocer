@@ -7,8 +7,10 @@ class TextRichWidget extends StatelessWidget {
   final String primaryName;
   final String secundName;
   final double fontSize;
-  final MaterialColor? colorPrimary;
+  final Color? colorPrimary;
   final Color? colorSecund;
+  final FontWeight? fontWeightPrimary;
+  final FontWeight? fontWeightSecund;
   const TextRichWidget({
     Key? key,
     required this.primaryName,
@@ -16,6 +18,8 @@ class TextRichWidget extends StatelessWidget {
     required this.fontSize,
     this.colorPrimary,
     this.colorSecund,
+    this.fontWeightPrimary,
+    this.fontWeightSecund,
   }) : super(key: key);
 
   @override
@@ -30,14 +34,14 @@ class TextRichWidget extends StatelessWidget {
             text: primaryName,
             style: TextStyle(
               color: colorPrimary ?? Colors.white,
-              fontWeight: FontWeight.bold,
+              fontWeight: fontWeightPrimary ?? FontWeight.bold,
             ),
           ),
           TextSpan(
             text: secundName,
             style: TextStyle(
               color: colorSecund ?? CustomColors.customContrastColor,
-              fontWeight: FontWeight.bold,
+              fontWeight: fontWeightSecund ?? FontWeight.bold,
             ),
           ),
         ],

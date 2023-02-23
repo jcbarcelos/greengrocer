@@ -4,21 +4,32 @@ import 'package:flutter/services.dart';
 
 // ignore: must_be_immutable
 class TextFormInputWidget extends StatefulWidget {
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final TextInputType keyboardType;
   late bool secret;
   final Icon icon;
   final String nameField;
+  final String? initialValue;
+  final bool readOnly;
   final List<TextInputFormatter>? inputFormats;
+  final String? Function(String?)? validator;
+  final String? Function(String?)? onchange;
+  final GlobalKey<FormFieldState>? formFieldkey;
+
   // ignore: prefer_const_constructors_in_immutables
   TextFormInputWidget({
     Key? key,
-    required this.controller,
+    this.controller,
     required this.keyboardType,
     this.secret = false,
     required this.icon,
     required this.nameField,
     this.inputFormats,
+    this.initialValue,
+    this.validator,
+    this.onchange,
+    this.readOnly = false,
+    this.formFieldkey,
   }) : super(key: key);
   @override
   State<TextFormInputWidget> createState() => _TextFormInputWidgetState();
@@ -36,35 +47,42 @@ class _TextFormInputWidgetState extends State<TextFormInputWidget> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
-      child: TextFormField(
-        controller: widget.controller,
-        keyboardType: widget.keyboardType,
-        obscureText: obscureText,
-        inputFormatters: widget.inputFormats,
-        decoration: InputDecoration(
-          isDense: true,
-          prefixIcon: widget.icon,
-          labelText: widget.nameField,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          suffixIcon: widget.secret
-              ? IconButton(
-                  icon: Icon(
-                    obscureText ? Icons.visibility : Icons.visibility_off,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      obscureText = !obscureText;
-                    });
-                  },
-                )
-              : null,
-        ),
-        validator: (String? value) {
-          return (value!.isEmpty)
-              ? '${widget.nameField} not empty ${widget.controller}.'
-              : null;
+      child: StatefulBuilder(
+        builder: (context, setState) {
+          return TextFormField(
+            key: widget.formFieldkey,
+            readOnly: widget.readOnly,
+            initialValue:
+                widget.initialValue == null || widget.controller == null
+                    ? widget.initialValue
+                    : widget.initialValue,
+            controller: widget.controller,
+            keyboardType: widget.keyboardType,
+            obscureText: obscureText,
+            inputFormatters: widget.inputFormats,
+            decoration: InputDecoration(
+              isDense: true,
+              prefixIcon: widget.icon,
+              labelText: widget.nameField,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(18),
+              ),
+              suffixIcon: widget.secret
+                  ? IconButton(
+                      icon: Icon(
+                        obscureText ? Icons.visibility : Icons.visibility_off,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          obscureText = !obscureText;
+                        });
+                      },
+                    )
+                  : null,
+            ),
+            validator: widget.validator,
+            onChanged: widget.onchange,
+          );
         },
       ),
     );

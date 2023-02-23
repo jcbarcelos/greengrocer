@@ -4,26 +4,38 @@ import 'package:greengrocer/src/models/item_model.dart';
 import 'package:greengrocer/src/pages/product/product_screen.dart';
 import 'package:greengrocer/src/services/util_services.dart';
 
-class ItemTitle extends StatelessWidget {
+class ItemTitle extends StatefulWidget {
   final ItemModel itemModel;
-  final UtilServices utilServices = UtilServices();
+  final void Function(GlobalKey) cartAnimationMethod;
 
-  ItemTitle({
+  const ItemTitle({
     super.key,
     required this.itemModel,
+    required this.cartAnimationMethod,
   });
 
+  @override
+  State<ItemTitle> createState() => _ItemTitleState();
+}
+
+class _ItemTitleState extends State<ItemTitle> {
+  final UtilServices utilServices = UtilServices();
+
+  final GlobalKey imageGk = GlobalKey();
+
+  IconData titleIcon = Icons.add_shopping_cart_outlined;
+  Future<void> switchIconAddCart() async {}
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         //content
-        GestureDetector(
+        InkWell(
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(builder: (_) {
                 return ProductScreen(
-                  itemModel: itemModel,
+                  itemModel: widget.itemModel,
                 );
               }),
             );
@@ -42,16 +54,16 @@ class ItemTitle extends StatelessWidget {
                   //imagem
                   Expanded(
                     child: Hero(
-                      tag: itemModel.imgUrl,
+                      tag: widget.itemModel.imgUrl,
                       child: Image.asset(
-                        itemModel.imgUrl,
-                        fit: BoxFit.contain,
+                        widget.itemModel.imgUrl,
+                        key: imageGk,
                       ),
                     ),
                   ),
 
                   Text(
-                    itemModel.itemName,
+                    widget.itemModel.itemName,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -61,7 +73,7 @@ class ItemTitle extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        utilServices.priceToCurrency(itemModel.price),
+                        utilServices.priceToCurrency(widget.itemModel.price),
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -70,7 +82,7 @@ class ItemTitle extends StatelessWidget {
                       ),
                       const SizedBox(width: 2),
                       Text(
-                        '/${itemModel.unit}',
+                        '/${widget.itemModel.unit}',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
@@ -89,24 +101,47 @@ class ItemTitle extends StatelessWidget {
         Positioned(
           top: 4,
           right: 4,
-          child: Container(
-            padding: EdgeInsets.zero,
-            decoration: BoxDecoration(
-              color: CustomColors.customSwatchColor,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(15),
-                topRight: Radius.circular(20),
-              ),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(15),
+              topRight: Radius.circular(20),
             ),
-            height: 40,
-            width: 35,
-            child: IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.add_shopping_cart_outlined,
-                color: Colors.white,
-                size: 20,
-              ),
+            child: StatefulBuilder(
+              builder: (context, setState) {
+                return Material(
+                  child: InkWell(
+                    child: Ink(
+                      padding: EdgeInsets.zero,
+                      decoration: BoxDecoration(
+                        color: CustomColors.customSwatchColor,
+                      ),
+                      height: 40,
+                      width: 35,
+                      child: IconButton(
+                        onPressed: () async {
+                          setState(
+                            (() => titleIcon = Icons.check),
+                          );
+                          widget.cartAnimationMethod(imageGk);
+                          await Future.delayed(
+                            const Duration(milliseconds: 1000),
+                          );
+
+                          setState(
+                            (() =>
+                                titleIcon = Icons.add_shopping_cart_outlined),
+                          );
+                        },
+                        icon: Icon(
+                          titleIcon,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ),

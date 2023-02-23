@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:greengrocer/src/models/item_model.dart';
 import 'package:greengrocer/src/services/util_services.dart';
 import 'package:greengrocer/src/widget/quantity_widget/quantity_widget.dart';
-import 'package:greengrocer/src/widget/snackbar_widget/snackbar_widget.dart';
 
 class ProductScreen extends StatefulWidget {
   final ItemModel itemModel;
@@ -114,12 +113,8 @@ class _ProductScreenState extends State<ProductScreen> {
                             ),
                           ),
                           onPressed: () {
-                            SnackBarWidget(
-                              context: context,
+                            utilServices.showToast(
                               message: 'Item adicionado ao carrinho',
-                              color: Colors.green,
-                              behavior: SnackBarBehavior.floating,
-                              actionLabelColor: Colors.white,
                             );
                           },
                           icon: const Icon(Icons.shopping_cart_outlined),

@@ -6,12 +6,10 @@ import 'package:greengrocer/src/widget/quantity_widget/quantity_widget.dart';
 
 class CartCard extends StatefulWidget {
   final CartItemModel cartItem;
-  //final Function(CartItemModel) remove;
   final Function(int) updatedQuantity;
   const CartCard({
     Key? key,
     required this.cartItem,
-    // required this.remove,
     required this.updatedQuantity,
   }) : super(key: key);
 
