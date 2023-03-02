@@ -22,20 +22,10 @@ class _HomeTabState extends State<HomeTab> {
   GlobalKey<CartIconKey> globalKeyCartItems = GlobalKey<CartIconKey>();
 
   late Function(GlobalKey) runAddToCardAnimation;
+  final TextEditingController searchController = TextEditingController();
 
   void itemSelectedCartAnimations(GlobalKey gkImage) {
     runAddToCardAnimation(gkImage);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    Get.find<HomeController>().allProducts;
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   @override
@@ -99,9 +89,22 @@ class _HomeTabState extends State<HomeTab> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // search
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-              child: TextInputSearch(),
+            GetBuilder<HomeController>(
+              builder: (homeController) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 20,
+                  ),
+                  child: TextInputSearch(
+                    searchController: searchController,
+                    onChanged: (value) {
+                      homeController.searchTitle.value = value;
+                    },
+                    getController: homeController,
+                  ),
+                );
+              },
             ),
             // Categories
             GetBuilder<HomeController>(
@@ -109,7 +112,7 @@ class _HomeTabState extends State<HomeTab> {
                 return Container(
                   padding: const EdgeInsets.only(left: 25),
                   height: 40,
-                  child: !homeController.isLoading
+                  child: !homeController.isCategoryLoading
                       ? ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemBuilder: (context, index) {
@@ -153,24 +156,49 @@ class _HomeTabState extends State<HomeTab> {
             GetBuilder<HomeController>(
               builder: (homeController) {
                 return Expanded(
-                  child: !homeController.isLoading
-                      ? GridView.builder(
-                          physics: const BouncingScrollPhysics(),
-                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 10,
-                            crossAxisSpacing: 10,
-                            childAspectRatio: 9 / 11.5,
+                  child: !homeController.isProductLoading
+                      ? Visibility(
+                          visible: (homeController.currentCategory?.items ?? [])
+                              .isNotEmpty,
+                          replacement: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.search_off,
+                                size: 40,
+                                color: CustomColors.customSwatchColor,
+                              ),
+                              const Text('Não há itens para apresentar'),
+                            ],
                           ),
-                          itemCount: homeController.allProducts.length,
-                          itemBuilder: ((context, index) {
-                            return ItemTitle(
-                              itemModel: homeController.allProducts[index],
-                              cartAnimationMethod: itemSelectedCartAnimations,
-                            );
-                          }),
+                          child: GridView.builder(
+                            physics: const BouncingScrollPhysics(),
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 10,
+                              crossAxisSpacing: 10,
+                              childAspectRatio: 9 / 11.5,
+                            ),
+                            itemCount: homeController.allProducts.length,
+                            itemBuilder: ((context, index) {
+                              if ((index + 1 ==
+                                      homeController.allProducts.length) &&
+                                  !homeController.isLastPage) {
+                                homeController.loadMoreProducts();
+                              }
+                              return GetBuilder<HomeController>(
+                                  builder: (homeController) {
+                                return ItemTitle(
+                                  homeController: homeController,
+                                  itemModel: homeController.allProducts[index],
+                                  cartAnimationMethod:
+                                      itemSelectedCartAnimations,
+                                );
+                              });
+                            }),
+                          ),
                         )
                       : GridView.count(
                           physics: const BouncingScrollPhysics(),

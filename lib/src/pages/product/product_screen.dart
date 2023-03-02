@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:greengrocer/src/models/item_model.dart';
+import 'package:greengrocer/src/pages/tabs/base/controller/navigation_controller.dart';
 import 'package:greengrocer/src/services/util_services.dart';
 import 'package:greengrocer/src/widget/quantity_widget/quantity_widget.dart';
 
@@ -16,7 +18,7 @@ class _ProductScreenState extends State<ProductScreen> {
   final UtilServices utilServices = UtilServices();
 
   int cartItemQuantity = 1;
-
+  final navigatorController = Get.find<NavigationController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +30,7 @@ class _ProductScreenState extends State<ProductScreen> {
               Expanded(
                 child: Hero(
                   tag: widget.itemModel.imgUrl,
-                  child: Image.asset(
+                  child: Image.network(
                     widget.itemModel.imgUrl,
                     fit: BoxFit.contain,
                   ),
@@ -113,9 +115,13 @@ class _ProductScreenState extends State<ProductScreen> {
                             ),
                           ),
                           onPressed: () {
+                            Get.back();
                             utilServices.showToast(
                               message: 'Item adicionado ao carrinho',
                             );
+                            FocusScope.of(context).unfocus();
+                            navigatorController
+                                .navigationPageView(NavigationTabs.cart);
                           },
                           icon: const Icon(Icons.shopping_cart_outlined),
                           label: const Text(
