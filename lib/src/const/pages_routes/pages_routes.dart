@@ -8,4 +8,9 @@ abstract class PagesRoutes {
   static String forgetPassword = Endpoints.forgetPassword;
   static String getAllCategories = Endpoints.getAllCategories;
   static String getAllProducts = Endpoints.getAllProducts;
+  /* cart */
+  static String modifyItemQuantityCart = Endpoints.modifyItemQuantityCart;
+  static String getCartItems = Endpoints.getCartItems;
+  static String addItemToCart = Endpoints.addItemToCart;
+  /* cart */
 }
